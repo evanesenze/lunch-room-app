@@ -1,20 +1,15 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import React from "react";
+import { StyleSheet, SafeAreaView, View, Text } from "react-native";
+import Layout from "./src/components/Layout.component";
 
-export default function App() {
+const App: React.FC = () => {
   return (
-    <View style={styles.container}>
-      <Text>Hello in Lunch Room app!</Text>
+    <View style={{ flex: 1 }}>
       <StatusBar style="auto" />
+      <Layout></Layout>
     </View>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
+export default App;
