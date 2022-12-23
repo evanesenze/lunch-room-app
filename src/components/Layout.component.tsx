@@ -2,10 +2,10 @@ import React from "react";
 import Navigation from "./Navigation.component";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import Home from "../Screen/Home.screen";
-import Orders from "../Screen/Orders.screen";
-import Cart from "../Screen/Cart.screen";
-import Profile from "../Screen/Profile.screen";
+import Home from "../screens/Home.screen";
+import Orders from "../screens/Orders.screen";
+import Cart from "../screens/Cart.screen";
+import Profile from "../screens/Profile.screen";
 
 export type AppParamsList = {
   Home: undefined;
