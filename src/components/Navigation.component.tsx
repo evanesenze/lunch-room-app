@@ -1,13 +1,17 @@
-import React, { useState, useCallback } from "react";
+import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import {
+  NavigationHelpers,
+  TabNavigationState,
+} from "@react-navigation/native";
+import React from "react";
 import { StyleSheet, View } from "react-native";
 
 import CartIcon from "../icons/Cart.icon";
 import HomeIcon from "../icons/Home.icon";
 import OrdersIcon from "../icons/Orders.icon";
 import ProfileIcon from "../icons/Profile.icon";
+import { AppParamsList } from "./Layout.component";
 import NavigationBtn, { INavigationBtnProps } from "./NavigationBtn.component";
-
-export type ViewType = "Home" | "Orders" | "Cart" | "Profile";
 
 const buttons: INavigationBtnProps[] = [
   { icon: <HomeIcon />, type: "Home" },
@@ -16,19 +20,20 @@ const buttons: INavigationBtnProps[] = [
   { icon: <ProfileIcon />, type: "Profile" },
 ];
 
-const Navigation: React.FC = () => {
-  const [currentView, setView] = useState<ViewType>("Home");
+interface INavigationProps extends BottomTabBarProps {
+  state: TabNavigationState<AppParamsList>;
+  navigation: NavigationHelpers<AppParamsList>;
+}
 
-  const switchView = useCallback((type: ViewType) => setView(type), []);
-
+const Navigation: React.FC<INavigationProps> = ({ state, navigation }) => {
   return (
     <View style={styles.navigation}>
-      {buttons.map((props) => (
+      {buttons.map((props, i) => (
         <NavigationBtn
           key={props.type}
           {...props}
-          isCurrent={props.type === currentView}
-          onClick={switchView}
+          isCurrent={i === state.index}
+          onClick={() => navigation.navigate(props.type)}
         />
       ))}
     </View>
@@ -38,7 +43,8 @@ const Navigation: React.FC = () => {
 const styles = StyleSheet.create({
   navigation: {
     backgroundColor: "#FF4F5A",
-    flex: 1,
+    // flex: 1,
+    height: "10%",
     width: "100%",
     paddingLeft: "5%",
     paddingRight: "5%",

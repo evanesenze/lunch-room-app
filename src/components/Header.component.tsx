@@ -42,6 +42,8 @@ const Header: React.FC<IHeaderProps> = ({ onBack, hideInfo }) => {
   );
 };
 
+const paddingTop = (StatusBar.currentHeight ?? getStatusBarHeight(true)) + 10;
+
 const styles = StyleSheet.create({
   modal: {
     flex: 1,
@@ -50,12 +52,13 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(1,1,1,0.6)",
   },
   header: {
-    flex: 1,
     width: "100%",
     flexDirection: "row",
     paddingLeft: "5%",
     paddingRight: "5%",
-    paddingTop: StatusBar.currentHeight ?? getStatusBarHeight(true),
+    paddingTop,
+    paddingBottom: "1%",
+    backgroundColor: "green",
   },
   btn: {
     width: "20%",

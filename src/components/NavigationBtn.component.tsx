@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { ViewType } from "./Navigation.component";
+import { ViewType } from "./Layout.component";
 
 export interface INavigationBtnProps {
   type: ViewType;
