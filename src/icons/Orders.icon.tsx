@@ -1,9 +1,10 @@
 import React from "react";
 import Svg, { Path } from "react-native-svg";
+import { IconProps } from "./Cart.icon";
 
-const OrdersIcon: React.FC = () => {
+const OrdersIcon: React.FC<IconProps> = ({ size }) => {
   return (
-    <Svg width="28" height="28" viewBox="0 0 23 22" fill="none">
+    <Svg width={size} height={size} viewBox="0 0 23 22" fill="none">
       <Path
         d="M21.333 4.8868V7.23831C21.333 8.77359 20.333 9.74529 18.753 9.74529H15.333V2.95312C15.333 1.87453 16.243 1 17.353 1C18.443 1.00972 19.443 1.43726 20.163 2.13689C20.883 2.84623 21.333 3.81793 21.333 4.8868Z"
         stroke="white"

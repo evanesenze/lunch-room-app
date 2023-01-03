@@ -21,7 +21,7 @@ const Support: React.FC<ISupportProps> = ({ onClose, ...props }) => {
   const handleSubmit = () => {
     reasonRef.current?.shake();
 
-    console.log(reasonRef.current?.input);
+    // console.log(reasonRef.current?.input);
   };
 
   return (
