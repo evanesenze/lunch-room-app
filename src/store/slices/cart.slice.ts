@@ -11,7 +11,9 @@ interface CartSliceState {
 
 
 const initialState: CartSliceState = {
-  items: []
+  items: [
+    { count: 1, id: '1' }
+  ]
 };
 
 const cartSlice = createSlice({

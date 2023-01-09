@@ -14,10 +14,10 @@ import { AppParamsList } from "./Layout.component";
 import NavigationBtn, { INavigationBtnProps } from "./NavigationBtn.component";
 
 const buttons: INavigationBtnProps[] = [
-  { icon: <HomeIcon />, type: "Home" },
-  { icon: <OrdersIcon />, type: "Orders" },
-  { icon: <CartIcon />, type: "Cart" },
-  { icon: <ProfileIcon />, type: "Profile" },
+  { icon: <HomeIcon size={26} />, type: "Home" },
+  { icon: <OrdersIcon size={26} />, type: "Orders" },
+  { icon: <CartIcon size={26} />, type: "Cart" },
+  { icon: <ProfileIcon size={26} />, type: "Profile" },
 ];
 
 interface INavigationProps extends BottomTabBarProps {

@@ -58,7 +58,6 @@ const styles = StyleSheet.create({
     paddingRight: "5%",
     paddingTop,
     paddingBottom: "1%",
-    backgroundColor: "green",
   },
   btn: {
     width: "20%",
