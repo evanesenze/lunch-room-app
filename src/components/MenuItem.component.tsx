@@ -1,10 +1,20 @@
 import React from "react";
-import { View, StyleSheet, Text, Image } from "react-native";
+import { View, StyleSheet, Text, Image, Pressable } from "react-native";
+import { useAppActions, useAppSelector } from "../hooks/useApp";
 import CartIcon from "../icons/Cart.icon";
+import { IMenuLunchSet } from "../store/apis/menu.api";
 
-interface IMenuItemProps {}
+interface IMenuItemProps {
+  item: IMenuLunchSet;
+  index: number;
+}
 
-const MenuItem: React.FC<IMenuItemProps> = () => {
+const MenuItem: React.FC<IMenuItemProps> = ({ index, item }) => {
+  const { items } = useAppSelector((store) => store.cart);
+  const { addToCart, removeFromCart } = useAppActions();
+
+  const currentCount = items.find(({ id }) => id === item.id)?.count ?? 0;
+
   return (
     <View style={styles.menuItem}>
       <Image
@@ -22,20 +32,22 @@ const MenuItem: React.FC<IMenuItemProps> = () => {
           marginTop: "3%",
         }}
       >
-        Комбо #1
+        Комбо #{index + 1}
       </Text>
       <Text
-        ellipsizeMode="middle"
-        numberOfLines={2}
+        // ellipsizeMode="middle"
+        // numberOfLines={item.lunchSetList.length + 1}
         style={{
-          height: 18,
+          // height: 18,
           fontSize: 10,
           lineHeight: 10,
           color: "grey",
-          // backgroundColor: "red",
           padding: "3%",
+          marginBottom: "auto",
         }}
       >
+        {item.lunchSetList.join("\n")}
+        {"\n"}
         600 г
       </Text>
       <View
@@ -45,12 +57,35 @@ const MenuItem: React.FC<IMenuItemProps> = () => {
           justifyContent: "flex-end",
           alignItems: "center",
           height: 30,
-          // backgroundColor: "green",
         }}
       >
-        <Text style={styles.price}>24 011 Р</Text>
+        <Text style={styles.price}>
+          {currentCount ? currentCount * item.price : item.price} Р
+        </Text>
         <View style={styles.cartButton}>
-          <CartIcon size={20} />
+          {!currentCount ? (
+            <Pressable onPress={() => addToCart(item.id)}>
+              <CartIcon size={20} />
+            </Pressable>
+          ) : (
+            <View style={{ flex: 1, flexDirection: "row" }}>
+              <Pressable onPress={() => removeFromCart(item.id)}>
+                <Text style={styles.cartControl}>-</Text>
+              </Pressable>
+              <Text
+                style={{
+                  ...styles.cartControl,
+                  paddingLeft: 15,
+                  paddingRight: 15,
+                }}
+              >
+                {currentCount}
+              </Text>
+              <Pressable onPress={() => addToCart(item.id)}>
+                <Text style={styles.cartControl}>+</Text>
+              </Pressable>
+            </View>
+          )}
         </View>
       </View>
     </View>
@@ -61,10 +96,7 @@ const styles = StyleSheet.create({
   menuItem: {
     position: "relative",
     flex: 1,
-    // justifyContent: "space-between",
-    // height: 200,
     borderRadius: 10,
-    // padding: "3%",
     paddingBottom: 0,
     margin: "1%",
     backgroundColor: "white",
@@ -75,7 +107,7 @@ const styles = StyleSheet.create({
     // position: "absolute",
     // bottom: -2,
     // right: -5,
-    width: 40,
+    // width: 40,
     height: 30,
     paddingLeft: 10,
     paddingRight: 10,
@@ -89,6 +121,11 @@ const styles = StyleSheet.create({
     lineHeight: 14,
     fontWeight: "600",
     marginRight: "2%",
+  },
+  cartControl: {
+    color: "white",
+    fontSize: 18,
+    lineHeight: 18,
   },
 });
 
