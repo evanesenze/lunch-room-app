@@ -11,16 +11,14 @@ interface CartSliceState {
 
 
 const initialState: CartSliceState = {
-  items: [
-    { count: 1, id: '1' }
-  ]
+  items: []
 };
 
 const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
-    add(state, action: PayloadAction<string>) {
+    addToCart(state, action: PayloadAction<string>) {
       const { payload } = action;
       const index = state.items.findIndex(item => item.id === payload);
       if (index === -1) {
@@ -29,7 +27,7 @@ const cartSlice = createSlice({
         state.items[index].count++;
       }
     },
-    remove(state, action: PayloadAction<string>) {
+    removeFromCart(state, action: PayloadAction<string>) {
       const { payload } = action;
       const index = state.items.findIndex(item => item.id === payload);
       if (index != -1) {
@@ -37,6 +35,9 @@ const cartSlice = createSlice({
       }
       state.items = state.items.filter(item => !!item.count);
     },
+    clearCart(state) {
+      state.items = [];
+    }
   }
 })
 

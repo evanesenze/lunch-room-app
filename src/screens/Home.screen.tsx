@@ -1,37 +1,30 @@
-import {
-  createNativeStackNavigator,
-  NativeStackScreenProps,
-} from "@react-navigation/native-stack";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { SearchBar } from "@rneui/themed";
-import React, { useState } from "react";
-import { View, ScrollView, FlatList } from "react-native";
-import { Text } from "react-native-svg";
+import React, { useEffect, useState } from "react";
+import { View, FlatList, Text } from "react-native";
 import Header from "../components/Header.component";
 import { AppParamsList } from "../components/Layout.component";
 import MenuItem from "../components/MenuItem.component";
 import { useAppSelector } from "../hooks/useApp";
+import { useLazyGetTodayMenuQuery } from "../store/apis/menu.api";
 
 // const Stack = createNativeStackNavigator<AppParamsList>();
 
-interface IMenuItem {
-  id: string;
-  title: string;
-  cost: number;
-}
-
-const items: IMenuItem[] = [
-  { id: "1", title: "Комбо 1", cost: 100 },
-  { id: "2", title: "Комбо 2", cost: 100 },
-  { id: "3", title: "Комбо 3", cost: 100 },
-  { id: "4", title: "Комбо 4", cost: 100 },
-  { id: "5", title: "Комбо 5", cost: 100 },
-];
-
 const Home: React.FC<NativeStackScreenProps<AppParamsList, "Home">> = () => {
   const [searchValue, setSearchValue] = useState("");
+  const { info } = useAppSelector((state) => state.user);
+  const [getTodayMenu, { data: menu, error, isFetching }] =
+    useLazyGetTodayMenuQuery();
+
+  useEffect(() => {
+    if (!info?.groups.length) return;
+    getTodayMenu({ groupId: info.groups[0] });
+  }, [info]);
+
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
       <Header />
+      {!!error && <Text>{JSON.stringify(error)}</Text>}
       <View style={{ flex: 1, marginLeft: "2%", marginRight: "2%" }}>
         <SearchBar
           value={searchValue}
@@ -43,6 +36,7 @@ const Home: React.FC<NativeStackScreenProps<AppParamsList, "Home">> = () => {
             padding: "1%",
             borderBottomColor: "transparent",
             borderTopColor: "transparent",
+            marginBottom: "2%",
           }}
           inputContainerStyle={{
             backgroundColor: "white",
@@ -52,13 +46,21 @@ const Home: React.FC<NativeStackScreenProps<AppParamsList, "Home">> = () => {
             borderLeftColor: "#F5F5F5",
             borderWidth: 1,
             borderBottomWidth: 1,
+            height: 22,
           }}
         />
-        <FlatList
-          data={["", "", "", "", "", "", "", ""]}
-          renderItem={MenuItem}
-          numColumns={2}
-        ></FlatList>
+        {isFetching && <Text>Loading...</Text>}
+        {!!menu && (
+          <FlatList
+            data={menu.lunchSets.filter((item) =>
+              item.lunchSetList.find((item) =>
+                item.match(new RegExp(`${searchValue}`, "gi"))
+              )
+            )}
+            renderItem={(props) => <MenuItem {...props} />}
+            numColumns={2}
+          />
+        )}
       </View>
     </View>
   );
