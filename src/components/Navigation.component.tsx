@@ -26,13 +26,14 @@ interface INavigationProps extends BottomTabBarProps {
 }
 
 const Navigation: React.FC<INavigationProps> = ({ state, navigation }) => {
+  if (state.index === 0) return <></>;
   return (
     <View style={styles.navigation}>
       {buttons.map((props, i) => (
         <NavigationBtn
           key={props.type}
           {...props}
-          isCurrent={i === state.index}
+          isCurrent={i === state.index - 1}
           onClick={() => navigation.navigate(props.type)}
         />
       ))}
