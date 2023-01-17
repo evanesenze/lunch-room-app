@@ -13,7 +13,8 @@ const MenuItem: React.FC<IMenuItemProps> = ({ index, item }) => {
   const { items } = useAppSelector((store) => store.cart);
   const { addToCart, removeFromCart } = useAppActions();
 
-  const currentCount = items.find(({ id }) => id === item.id)?.count ?? 0;
+  const currentCount =
+    items.find(({ item: { id } }) => id === item.id)?.count ?? 0;
 
   return (
     <View style={styles.menuItem}>
@@ -64,12 +65,12 @@ const MenuItem: React.FC<IMenuItemProps> = ({ index, item }) => {
         </Text>
         <View style={styles.cartButton}>
           {!currentCount ? (
-            <Pressable onPress={() => addToCart(item.id)}>
+            <Pressable onPress={() => addToCart(item)}>
               <CartIcon size={20} />
             </Pressable>
           ) : (
             <View style={{ flex: 1, flexDirection: "row" }}>
-              <Pressable onPress={() => removeFromCart(item.id)}>
+              <Pressable onPress={() => removeFromCart(item)}>
                 <Text style={styles.cartControl}>-</Text>
               </Pressable>
               <Text
@@ -81,7 +82,7 @@ const MenuItem: React.FC<IMenuItemProps> = ({ index, item }) => {
               >
                 {currentCount}
               </Text>
-              <Pressable onPress={() => addToCart(item.id)}>
+              <Pressable onPress={() => addToCart(item)}>
                 <Text style={styles.cartControl}>+</Text>
               </Pressable>
             </View>

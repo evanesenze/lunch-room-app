@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Alert, Pressable, SafeAreaView, TextInput, View } from "react-native";
 import { AppParamsList } from "../components/Layout.component";
 import { useAppActions, useAppSelector } from "../hooks/useApp";
-import { useAuthMutation } from "../store/apis/auth.api";
+import { useAuthMutation, useRegisterMutation } from "../store/apis/auth.api";
 import { useLazyGetUserQuery } from "../store/apis/user.api";
 import jwt from "jwt-decode";
 
@@ -15,6 +15,7 @@ const Auth: React.FC<NativeStackScreenProps<AppParamsList, "Auth">> = ({
   const { state } = useAppSelector((store) => store.user);
   const { updateUser } = useAppActions();
   const [auth, { isLoading }] = useAuthMutation();
+  const [reg, { isLoading: isRegLoading }] = useRegisterMutation();
   const [getUser, { isLoading: isUserLoading }] = useLazyGetUserQuery();
   const storageToken = useAsyncStorage("token");
   const [isSecure, setIsSecure] = useState(true);
@@ -24,10 +25,6 @@ const Auth: React.FC<NativeStackScreenProps<AppParamsList, "Auth">> = ({
   const [password2, setPassword2] = useState("");
 
   const login = async () => {
-    // const token =
-    //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiJhMTFjM2I5NC0xYTBlLTQ4YWEtODNhMC04ZDMwNWU5ZDkyYTUiLCJlbWFpbCI6ImFkbWluQGFkbWluLnJ1Iiwicm9sZSI6IkFkbWluIiwibmJmIjoxNjczMzY2MTA4LCJleHAiOjE2NzYwNDQ1MDgsImlhdCI6MTY3MzM2NjEwOCwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NTEyOSIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjUxMjkifQ.xKl3cznbSvuxbxAdCb9sT160VDa4qvv6k6cHqnmG-SM";
-    // const token =
-    //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiI0NzBmM2VhYS02NzI2LTQ5NTEtYTc1Zi1lMWIzZmJhMDFiZDUiLCJlbWFpbCI6InVzZXJAdXNlci5ydSIsInJvbGUiOiJVc2VyIiwibmJmIjoxNjczMjc3NTUxLCJleHAiOjE2NzU5NTU5NTEsImlhdCI6MTY3MzI3NzU1MSwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NTEyOSIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjUxMjkifQ.56vksmmLWnmbOKwr1m9GXHG8Qpz3tvg6s3WWWVHUWfc";
     const token = await storageToken.getItem();
     if (!token || token.split(".").length < 3)
       return updateUser({ state: "unauth" });
@@ -35,7 +32,6 @@ const Auth: React.FC<NativeStackScreenProps<AppParamsList, "Auth">> = ({
     const userInfo = await getUser({ userId, token })
       .unwrap()
       .catch(console.error);
-    // Alert.alert(userInfo ? `Логин за ${userInfo.email}` : "Авторизуйтесь");
     updateUser({ info: userInfo ?? undefined, token, state: "auth" });
   };
   useEffect(() => {
@@ -43,10 +39,15 @@ const Auth: React.FC<NativeStackScreenProps<AppParamsList, "Auth">> = ({
   }, []);
 
   const handleSubmit = async () => {
+    if (!isLogin && password !== password2)
+      return Alert.alert("Ошибка", "Пароли не совпадают");
     if (isLogin) {
       const token = await auth({ email, password })
         .unwrap()
-        .catch(() => Alert.alert("Ошибка", "При авторизации произошла ошибка"));
+        .catch((error) => {
+          console.log(error);
+          Alert.alert("Упс...", "При авторизации произошла ошибка");
+        });
       if (!token) return;
       const userId = jwt<{ UserID: string }>(token).UserID;
       const userInfo = await getUser({ userId, token })
@@ -55,10 +56,16 @@ const Auth: React.FC<NativeStackScreenProps<AppParamsList, "Auth">> = ({
       updateUser({ info: userInfo ?? undefined, token, state: "auth" });
       storageToken.setItem(token);
     } else {
+      await reg({ email, password })
+        .unwrap()
+        .then(() => {
+          setIsLogin(true);
+          Alert.alert(
+            "Успех",
+            "Вы успешно зарегистрировались. Теперь подтвердите свою почту"
+          );
+        });
     }
-    // console.log(email);
-    // console.log(password);
-    // console.log(password2);
   };
 
   useEffect(() => {

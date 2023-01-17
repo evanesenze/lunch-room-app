@@ -5,6 +5,7 @@ import userSlice from "./slices/user.slice";
 import { setupListeners, } from '@reduxjs/toolkit/query';
 import authApi from "./apis/auth.api";
 import menuApi from "./apis/menu.api";
+import orderApi from "./apis/order.api";
 
 
 export const store = configureStore({
@@ -14,8 +15,9 @@ export const store = configureStore({
     [userApi.reducerPath]: userApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
     [menuApi.reducerPath]: menuApi.reducer,
+    [orderApi.reducerPath]: orderApi.reducer
   },
-  middleware: (getDefault) => getDefault().concat(userApi.middleware, authApi.middleware, menuApi.middleware)
+  middleware: (getDefault) => getDefault().concat(userApi.middleware, authApi.middleware, menuApi.middleware, orderApi.middleware)
 })
 
 

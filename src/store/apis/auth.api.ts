@@ -24,11 +24,19 @@ const authApi = createApi({
         headers: { 'Content-Type': 'application/json' },
         body
       })
+    }),
+    register: mutation<string, IAuth>({
+      query: (body) => ({
+        url: 'RegisterUser',
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body
+      })
     })
   })
 
 });
 
-export const { useAuthMutation } = authApi;
+export const { useAuthMutation, useRegisterMutation } = authApi;
 
 export default authApi;
