@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Pressable, StatusBar } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Pressable,
+  StatusBar,
+  ViewStyle,
+} from "react-native";
 import BackIcon from "../icons/Back.icon";
 import InfoIcon from "../icons/Info.icon";
 import LunchRoomIcon from "../icons/LunchRoom.icon";
@@ -9,12 +15,18 @@ import { getStatusBarHeight } from "react-native-status-bar-height";
 interface IHeaderProps {
   onBack?(): void;
   hideInfo?: boolean;
+  containerStyle?: ViewStyle;
 }
 
-const Header: React.FC<IHeaderProps> = ({ onBack, hideInfo }) => {
+const Header: React.FC<IHeaderProps> = ({
+  onBack,
+  hideInfo,
+  containerStyle,
+}) => {
   const [modalVisible, setModalVisible] = useState(false);
+  containerStyle;
   return (
-    <View style={styles.header}>
+    <View style={{ ...styles.header, ...containerStyle }}>
       <Support
         transparent
         visible={modalVisible}

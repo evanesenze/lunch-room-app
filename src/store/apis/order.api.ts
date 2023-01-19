@@ -12,11 +12,21 @@ interface ICreateOrderProps {
   customerId: string;
   menuId: string;
   lunchSetId: string;
+  lunchSetUnits: number;
   options: OrderOption[];
 }
 
 interface IConfirmPaymentProps {
   orderId: string;
+}
+
+interface IGetOrdersByUserProps {
+  userId: string;
+  groupId: string;
+}
+
+interface IGetOrderProps {
+  orderId: string
 }
 
 interface Option2 {
@@ -52,14 +62,16 @@ const orderApi = createApi({
       return headers;
     },
   }),
-  endpoints: ({ mutation }) => ({
+  tagTypes: ['UserOrders'],
+  endpoints: ({ mutation, query }) => ({
     createOrder: mutation<IOrder, ICreateOrderProps>({
       query: (body) => ({
         url: 'CreateOrder',
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body
-      })
+      }),
+      invalidatesTags: ['UserOrders']
     }),
     confirmPayment: mutation<void, IConfirmPaymentProps>({
       query: (params) => ({
@@ -68,10 +80,23 @@ const orderApi = createApi({
         params
       })
     }),
+    getOrdersByUser: query<{ date: string, id: string }[], IGetOrdersByUserProps>({
+      query: (params) => ({
+        url: 'GetOrdersByUser',
+        params
+      }),
+      providesTags: ['UserOrders']
+    }),
+    getOrder: query<IOrder, IGetOrderProps>({
+      query: (params) => ({
+        url: 'GetOrder',
+        params
+      })
+    })
   })
 
 });
 
-export const { useCreateOrderMutation, useConfirmPaymentMutation } = orderApi;
+export const { useCreateOrderMutation, useConfirmPaymentMutation, useGetOrdersByUserQuery, useLazyGetOrderQuery, useGetOrderQuery } = orderApi;
 
 export default orderApi;
