@@ -48,7 +48,7 @@ const MenuItem: React.FC<IMenuItemProps> = ({ index, item }) => {
         }}
       >
         {item.lunchSetList.join("\n")}
-        {"\n"}
+        {"\n\n"}
         600 г
       </Text>
       <View

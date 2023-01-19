@@ -11,7 +11,7 @@ import Auth from "../screens/Auth.screen";
 export type AppParamsList = {
   Home: undefined;
   Orders: undefined;
-  Cart: undefined;
+  Cart: { orderId?: string } | undefined;
   Profile: undefined;
   Auth: undefined;
 };
