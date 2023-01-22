@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { RootState } from '..';
+import { API_URL } from '@env';
 
 interface IAuth {
   email: string;
@@ -9,7 +10,7 @@ interface IAuth {
 const authApi = createApi({
   reducerPath: 'auth/api',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://45.86.183.11:5000/api/Auth/',
+    baseUrl: `${API_URL}/Auth/`,
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as RootState).user.token;
       if (token) headers.set('Authorization', `Bearer ${token}`);

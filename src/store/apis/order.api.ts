@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { RootState } from '..';
 import { IMenuLunchSet } from './menu.api';
+import { API_URL } from '@env';
 
 interface OrderOption {
   optionId: string;
@@ -55,7 +56,7 @@ export interface IOrder {
 const orderApi = createApi({
   reducerPath: 'order/api',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://45.86.183.11:5000/api/Orders/',
+    baseUrl: `${API_URL}/Orders/`,
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as RootState).user.token;
       if (token) headers.set('Authorization', `Bearer ${token}`);

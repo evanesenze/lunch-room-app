@@ -1,61 +1,57 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { ViewType } from "./Layout.component";
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { IconProps } from '../icons/Cart.icon';
+import { ViewType } from './Layout.component';
 
 export interface INavigationBtnProps {
   type: ViewType;
-  icon: JSX.Element;
+  Icon: React.FC<IconProps>;
   isCurrent?: boolean;
-  onClick?(type: ViewType): void;
+  onClick(type: ViewType): void;
 }
 
 const buttonsName: Record<ViewType, string> = {
-  Cart: "Cart",
-  Home: "Home",
-  Orders: "Orders",
-  Profile: "Profile",
+  Auth: 'Auth',
+  Cart: 'Cart',
+  Home: 'Home',
+  Orders: 'Orders',
+  Profile: 'Profile',
 };
 
-const NavigationBtn: React.FC<INavigationBtnProps> = ({
-  icon,
-  type,
-  isCurrent,
-  onClick,
-}) => {
+const NavigationBtn: React.FC<INavigationBtnProps> = ({ Icon, type, isCurrent, onClick }) => {
   return (
     <View
       style={{
         ...styles.navigationItem,
         ...(isCurrent ? styles.selectedNavigationItem : undefined),
       }}
-      onTouchStart={() => onClick?.(type)}
+      onTouchStart={() => onClick(type)}
     >
-      {icon}
-      {isCurrent && (
-        <Text style={styles.navigationText}>{buttonsName[type]}</Text>
-      )}
+      <Icon size={26} fill={isCurrent} />
+      {isCurrent && <Text style={styles.navigationText}>{buttonsName[type]}</Text>}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   navigationText: {
-    color: "white",
+    color: 'white',
     fontSize: 8,
   },
   navigationItem: {
-    width: "20%",
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
+    width: '20%',
+    height: '100%',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: "transparent",
-    marginRight: "2.5%",
-    marginLeft: "2.5%",
+    borderTopColor: 'transparent',
+    paddingTop: '3%',
+    marginRight: '2.5%',
+    marginLeft: '2.5%',
     transition: 1,
   },
   selectedNavigationItem: {
-    borderTopColor: "white",
+    borderTopColor: 'white',
   },
 });
 

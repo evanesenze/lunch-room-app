@@ -12,13 +12,17 @@ import { IOrder, useConfirmPaymentMutation, useCreateOrderMutation, useGetOrderQ
 const Cart: React.FC<NativeStackScreenProps<AppParamsList, 'Cart'>> = ({ navigation, route: { params } }) => {
   const { items } = useAppSelector((store) => store.cart);
   const { info } = useAppSelector((store) => store.user);
+  const { activeGroup } = useAppSelector((store) => store.group);
   const { clearCart } = useAppActions();
   const [createOrder, { isLoading: isOrderLoading }] = useCreateOrderMutation();
   const [confirmPayment, { isLoading: isPaymentLoading }] = useConfirmPaymentMutation();
   const [isPayment, setIsPayment] = useState(!!params?.orderId);
-  const { data: menu } = useGetTodayMenuQuery({
-    groupId: String(info?.groups[0]),
-  });
+  const { data: menu } = useGetTodayMenuQuery(
+    {
+      groupId: String(activeGroup?.id),
+    },
+    { skip: !activeGroup }
+  );
   const { data: existOrder } = useGetOrderQuery({ orderId: String(params?.orderId) }, { skip: !params?.orderId });
   const [currentOrder, setCurrentOrder] = useState<IOrder | undefined>(existOrder);
 
@@ -39,10 +43,10 @@ const Cart: React.FC<NativeStackScreenProps<AppParamsList, 'Cart'>> = ({ navigat
 
   const create = async () => {
     if (!items.length) return;
-    if (!currentOrder && info && menu) {
+    if (!currentOrder && info && menu && activeGroup) {
       const res = await createOrder({
         customerId: info.id,
-        groupId: info.groups[0],
+        groupId: activeGroup.id,
         lunchSetId: items[0].item.id,
         menuId: menu.id,
         lunchSetUnits: items[0].count,
@@ -59,15 +63,15 @@ const Cart: React.FC<NativeStackScreenProps<AppParamsList, 'Cart'>> = ({ navigat
 
   return (
     <View style={styles.container}>
-      <Header onBack={isPayment ? () => setIsPayment(false) : undefined} containerStyle={{ marginBottom: 10 }} />
+      <Header onBack={isPayment ? () => setIsPayment(false) : undefined} containerStyle={styles.headerContainer} />
       <ScrollView bounces={!isPayment && !!items.length}>
         <Text h3 style={styles.pageTitle}>
           {isPayment ? 'Оплата' : 'Корзина'}
         </Text>
-        {!items.length && (
-          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ marginTop: '5%' }}>Ваша корзина пуста!</Text>
-            <Image style={{ width: 414, height: 414 }} source={require('../../assets/EmptyCart.png')} />
+        {!isPayment && !items.length && (
+          <View style={styles.emptyCart}>
+            <Text style={styles.emptyCartTitle}>Ваша корзина пуста!</Text>
+            <Image style={styles.emptyCartImage} source={require('../../assets/EmptyCart.png')} />
           </View>
         )}
         {isPayment ? (
@@ -76,7 +80,7 @@ const Cart: React.FC<NativeStackScreenProps<AppParamsList, 'Cart'>> = ({ navigat
           items.map((item, i) => <CartItem key={i} index={i} item={item} />)
         )}
       </ScrollView>
-      {!!items.length && (
+      {(isPayment || !!items.length) && (
         <View style={styles.cartInfo}>
           <View style={styles.totalCost}>
             <Text h4>Общая стоимость</Text>
@@ -118,6 +122,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 10,
   },
+  headerContainer: { marginBottom: 10 },
+  emptyCart: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  emptyCartTitle: { marginTop: '5%' },
+  emptyCartImage: { width: 414, height: 414 },
 });
 
 export default Cart;
