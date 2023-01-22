@@ -1,8 +1,9 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { RootState } from '..';
 import { IUserInfo } from '../slices/user.slice';
+import { API_URL } from '@env';
 
-interface IGetUser {
+export interface IGetUser {
   userId: string;
   token?: string;
 }
@@ -19,13 +20,14 @@ interface IUpdateUser {
 const userApi = createApi({
   reducerPath: 'user/api',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://45.86.183.11:5000/api/User/',
+    baseUrl: `${API_URL}/User/`,
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as RootState).user.token;
       if (token) headers.set('Authorization', `Bearer ${token}`);
       return headers;
     },
   }),
+  tagTypes: ['User'],
   endpoints: ({ mutation, query }) => ({
     getUser: query<IUserInfo, IGetUser>({
       query: ({ userId, token }) => ({
@@ -34,23 +36,29 @@ const userApi = createApi({
           userId
         },
         headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
-      })
+      }),
+      providesTags: ['User']
     }),
     updateUser: mutation<IUserInfo, IUpdateUser>({
-      query: ({ userId, body }) => ({
-        url: 'GetUser',
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        params: {
-          userId
-        },
-        body
-      })
+      query: ({ userId, body }) => {
+        console.log(body);
+        console.log(userId);
+        return ({
+          url: 'UpdateUser',
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          params: {
+            userId
+          },
+          body
+        })
+      },
+      invalidatesTags: ['User']
     })
   })
 
 });
 
-export const { useLazyGetUserQuery } = userApi;
+export const { useLazyGetUserQuery, useUpdateUserMutation } = userApi;
 
 export default userApi;

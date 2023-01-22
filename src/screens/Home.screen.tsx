@@ -2,9 +2,10 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Image } from '@rneui/base';
 import { SearchBar, Text } from '@rneui/themed';
 import React, { useEffect, useState } from 'react';
-import { View, FlatList } from 'react-native';
+import { View, FlatList, StyleSheet } from 'react-native';
 import Header from '../components/Header.component';
 import { AppParamsList } from '../components/Layout.component';
+import Loading from '../components/Loading.component';
 import MenuItem from '../components/MenuItem.component';
 import { useAppSelector } from '../hooks/useApp';
 import { useLazyGetTodayMenuQuery } from '../store/apis/menu.api';
@@ -22,40 +23,25 @@ const Home: React.FC<NativeStackScreenProps<AppParamsList, 'Home'>> = () => {
   }, [info]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'white' }}>
+    <View style={styles.container}>
       <Header />
-      {isFetching && <Text>Loading...</Text>}
+      {isFetching && <Loading />}
       {!!error && (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <Text h4>Мы еще составляем меню!</Text>
-          <Text h4>Вернитесь позже</Text>
-          <Image style={{ width: 414, height: 414 }} source={require('../../assets/MenuNotFound.png')} />
+        <View style={styles.emptyMenu}>
+          <Text>Мы еще составляем меню!</Text>
+          <Text>Вернитесь позже</Text>
+          <Image style={styles.emptyMenuImage} source={require('../../assets/MenuNotFound.png')} />
         </View>
       )}
       {!!menu && (
-        <View style={{ flex: 1, marginLeft: '2%', marginRight: '2%' }}>
+        <View style={styles.menuContainer}>
           <SearchBar
             value={searchValue}
             onChangeText={setSearchValue}
             lightTheme
             round
-            containerStyle={{
-              backgroundColor: 'transparent',
-              padding: '1%',
-              borderBottomColor: 'transparent',
-              borderTopColor: 'transparent',
-              marginBottom: '2%',
-            }}
-            inputContainerStyle={{
-              backgroundColor: 'white',
-              borderBottomColor: '#F5F5F5',
-              borderTopColor: '#F5F5F5',
-              borderRightColor: '#F5F5F5',
-              borderLeftColor: '#F5F5F5',
-              borderWidth: 1,
-              borderBottomWidth: 1,
-              height: 22,
-            }}
+            containerStyle={styles.searchBarContainer}
+            inputContainerStyle={styles.searchBarInput}
           />
           <FlatList
             data={menu.lunchSets.filter((item) => item.lunchSetList.find((item) => item.match(new RegExp(`${searchValue}`, 'gi'))))}
@@ -67,5 +53,35 @@ const Home: React.FC<NativeStackScreenProps<AppParamsList, 'Home'>> = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingLeft: '4%',
+    paddingRight: '4%',
+    position: 'relative',
+    backgroundColor: 'white',
+  },
+  emptyMenu: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  emptyMenuImage: { width: 414, height: 414 },
+  menuContainer: { flex: 1 },
+  searchBarContainer: {
+    backgroundColor: 'transparent',
+    padding: '1%',
+    borderBottomColor: 'transparent',
+    borderTopColor: 'transparent',
+    marginBottom: '2%',
+  },
+  searchBarInput: {
+    backgroundColor: 'white',
+    borderBottomColor: '#F5F5F5',
+    borderTopColor: '#F5F5F5',
+    borderRightColor: '#F5F5F5',
+    borderLeftColor: '#F5F5F5',
+    borderWidth: 1,
+    borderBottomWidth: 1,
+    height: 22,
+  },
+});
 
 export default Home;

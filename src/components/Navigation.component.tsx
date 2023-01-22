@@ -1,23 +1,20 @@
-import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import {
-  NavigationHelpers,
-  TabNavigationState,
-} from "@react-navigation/native";
-import React from "react";
-import { StyleSheet, View } from "react-native";
+import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { NavigationHelpers, TabNavigationState } from '@react-navigation/native';
+import React from 'react';
+import { Alert, StyleSheet, View } from 'react-native';
+import { useAppSelector } from '../hooks/useApp';
+import CartIcon from '../icons/Cart.icon';
+import HomeIcon from '../icons/Home.icon';
+import OrdersIcon from '../icons/Orders.icon';
+import ProfileIcon from '../icons/Profile.icon';
+import { AppParamsList } from './Layout.component';
+import NavigationBtn, { INavigationBtnProps } from './NavigationBtn.component';
 
-import CartIcon from "../icons/Cart.icon";
-import HomeIcon from "../icons/Home.icon";
-import OrdersIcon from "../icons/Orders.icon";
-import ProfileIcon from "../icons/Profile.icon";
-import { AppParamsList } from "./Layout.component";
-import NavigationBtn, { INavigationBtnProps } from "./NavigationBtn.component";
-
-const buttons: INavigationBtnProps[] = [
-  { icon: <HomeIcon size={26} />, type: "Home" },
-  { icon: <OrdersIcon size={26} />, type: "Orders" },
-  { icon: <CartIcon size={26} />, type: "Cart" },
-  { icon: <ProfileIcon size={26} />, type: "Profile" },
+const buttons: Omit<INavigationBtnProps, 'onClick'>[] = [
+  { Icon: HomeIcon, type: 'Home' },
+  { Icon: OrdersIcon, type: 'Orders' },
+  { Icon: CartIcon, type: 'Cart' },
+  { Icon: ProfileIcon, type: 'Profile' },
 ];
 
 interface INavigationProps extends BottomTabBarProps {
@@ -27,15 +24,21 @@ interface INavigationProps extends BottomTabBarProps {
 
 const Navigation: React.FC<INavigationProps> = ({ state, navigation }) => {
   if (state.index === 0) return <></>;
+
+  const { activeGroupAvailable } = useAppSelector((store) => store.group);
+
+  const onClick = (props: Omit<INavigationBtnProps, 'onClick'>) => {
+    if (props.type === 'Home' && !activeGroupAvailable) {
+      Alert.alert('Упс..', 'Сначала выберите команду в Профиле');
+      return navigation.navigate('Profile');
+    }
+    navigation.navigate(props.type);
+  };
+
   return (
     <View style={styles.navigation}>
       {buttons.map((props, i) => (
-        <NavigationBtn
-          key={props.type}
-          {...props}
-          isCurrent={i === state.index - 1}
-          onClick={() => navigation.navigate(props.type)}
-        />
+        <NavigationBtn key={props.type} {...props} isCurrent={i === state.index - 1} onClick={() => onClick(props)} />
       ))}
     </View>
   );
@@ -43,31 +46,12 @@ const Navigation: React.FC<INavigationProps> = ({ state, navigation }) => {
 
 const styles = StyleSheet.create({
   navigation: {
-    backgroundColor: "#FF4F5A",
-    // flex: 1,
-    height: "10%",
-    width: "100%",
-    paddingLeft: "5%",
-    paddingRight: "5%",
-    flexDirection: "row",
-  },
-  navigationText: {
-    color: "white",
-    textAlign: "center",
-    fontSize: 8,
-  },
-  navigationItem: {
-    width: "20%",
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    borderTopWidth: 1,
-    borderTopColor: "transparent",
-    marginRight: "2.5%",
-    marginLeft: "2.5%",
-  },
-  selectedNavigationItem: {
-    borderTopColor: "white",
+    backgroundColor: '#FF4F5A',
+    height: '8%',
+    width: '100%',
+    paddingLeft: '5%',
+    paddingRight: '5%',
+    flexDirection: 'row',
   },
 });
 
