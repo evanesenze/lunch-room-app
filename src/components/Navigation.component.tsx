@@ -28,6 +28,7 @@ const Navigation: React.FC<INavigationProps> = ({ state, navigation }) => {
   const { activeGroupAvailable } = useAppSelector((store) => store.group);
 
   const onClick = (props: Omit<INavigationBtnProps, 'onClick'>) => {
+    if (props.isCurrent) return;
     if (props.type === 'Home' && !activeGroupAvailable) {
       Alert.alert('Упс..', 'Сначала выберите команду в Профиле');
       return navigation.navigate('Profile');
@@ -38,7 +39,12 @@ const Navigation: React.FC<INavigationProps> = ({ state, navigation }) => {
   return (
     <View style={styles.navigation}>
       {buttons.map((props, i) => (
-        <NavigationBtn key={props.type} {...props} isCurrent={i === state.index - 1} onClick={() => onClick(props)} />
+        <NavigationBtn
+          key={props.type}
+          {...props}
+          isCurrent={i === state.index - 1}
+          onClick={() => onClick({ ...props, isCurrent: i === state.index - 1 })}
+        />
       ))}
     </View>
   );

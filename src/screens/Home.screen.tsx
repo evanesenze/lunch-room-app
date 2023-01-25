@@ -45,6 +45,7 @@ const Home: React.FC<NativeStackScreenProps<AppParamsList, 'Home'>> = () => {
           />
           <FlatList
             data={menu.lunchSets.filter((item) => item.lunchSetList.find((item) => item.match(new RegExp(`${searchValue}`, 'gi'))))}
+            keyExtractor={(item) => item.id}
             renderItem={(props) => <MenuItem {...props} />}
             numColumns={2}
           />

@@ -16,6 +16,8 @@ const JoinGroup: React.FC<CommonModalProps<IJoinGroupProps, string>> = ({ props,
   const submit = () => {
     const userId = info?.id;
     if (userId) {
+      console.log(groupId);
+      console.log(userId);
       addGroupMember({ groupId, userId })
         .unwrap()
         .then(() => {

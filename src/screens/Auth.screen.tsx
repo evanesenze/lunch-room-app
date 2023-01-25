@@ -32,8 +32,8 @@ const Auth: React.FC<NativeStackScreenProps<AppParamsList, 'Auth'>> = ({ navigat
     if (!token || token.split('.').length < 3) return updateUser({ state: 'unauth' });
     const userId = jwt<{ UserID: string }>(token).UserID;
     const userInfo = await getUser({ userId, token }).unwrap().catch(console.error);
-    updateUser({ info: userInfo ?? undefined, token, state: 'auth' });
     await loadGroups(userInfo?.groups ?? []);
+    updateUser({ info: userInfo ?? undefined, token, state: 'auth' });
   };
 
   useEffect(() => {
@@ -52,9 +52,9 @@ const Auth: React.FC<NativeStackScreenProps<AppParamsList, 'Auth'>> = ({ navigat
       if (!token) return;
       const userId = jwt<{ UserID: string }>(token).UserID;
       const userInfo = await getUser({ userId, token }).unwrap().catch(console.error);
+      await loadGroups(userInfo?.groups ?? []);
       updateUser({ info: userInfo ?? undefined, token, state: 'auth' });
       storageToken.setItem(token);
-      await loadGroups(userInfo?.groups ?? []);
     } else {
       await reg({ email, password })
         .unwrap()
@@ -67,11 +67,11 @@ const Auth: React.FC<NativeStackScreenProps<AppParamsList, 'Auth'>> = ({ navigat
 
   const loadGroups = async (groups: string[]) => {
     const res = await Promise.all(groups.map((groupId) => getGroup({ groupId }).unwrap()));
-    updateGroups(res);
+    await updateGroups(res);
     const activeGroupId = await storageActiveGroupId.getItem();
     const activeGroup = res.find((item) => item.id === activeGroupId);
     if (!activeGroup) return;
-    updateActiveGroup(activeGroup);
+    await updateActiveGroup(activeGroup);
   };
 
   useEffect(() => {

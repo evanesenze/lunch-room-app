@@ -1,13 +1,14 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button, Text, Image } from '@rneui/base';
 import React, { useState } from 'react';
-import { Alert, ScrollView, View, StyleSheet } from 'react-native';
+import { Alert, ScrollView, View, StyleSheet, Linking } from 'react-native';
 import CartItem from '../components/CartItem.component';
 import Header from '../components/Header.component';
 import { AppParamsList } from '../components/Layout.component';
 import { useAppActions, useAppSelector } from '../hooks/useApp';
 import { useGetTodayMenuQuery } from '../store/apis/menu.api';
 import { IOrder, useConfirmPaymentMutation, useCreateOrderMutation, useGetOrderQuery } from '../store/apis/order.api';
+import QRCode from 'react-native-qrcode-svg';
 
 const Cart: React.FC<NativeStackScreenProps<AppParamsList, 'Cart'>> = ({ navigation, route: { params } }) => {
   const { items } = useAppSelector((store) => store.cart);
@@ -26,7 +27,7 @@ const Cart: React.FC<NativeStackScreenProps<AppParamsList, 'Cart'>> = ({ navigat
   const { data: existOrder } = useGetOrderQuery({ orderId: String(params?.orderId) }, { skip: !params?.orderId });
   const [currentOrder, setCurrentOrder] = useState<IOrder | undefined>(existOrder);
 
-  const totalCost = existOrder?.lunchSet.price ?? items.reduce((acc, { count, item }) => acc + count * item.price, 0);
+  const totalCost = isPayment ? currentOrder?.lunchSet.price : items.reduce((acc, { count, item }) => acc + count * item.price, 0);
 
   const confirm = () => {
     if (!currentOrder) return;
@@ -42,28 +43,32 @@ const Cart: React.FC<NativeStackScreenProps<AppParamsList, 'Cart'>> = ({ navigat
   };
 
   const create = async () => {
-    if (!items.length) return;
-    if (!currentOrder && info && menu && activeGroup) {
-      const res = await createOrder({
-        customerId: info.id,
-        groupId: activeGroup.id,
-        lunchSetId: items[0].item.id,
-        menuId: menu.id,
-        lunchSetUnits: items[0].count,
-        options: [],
+    if (!items.length || currentOrder || !info || !menu || !activeGroup) return;
+    await createOrder({
+      customerId: info.id,
+      groupId: activeGroup.id,
+      lunchSetId: items[0].item.id,
+      menuId: menu.id,
+      lunchSetUnits: items[0].count,
+      options: [],
+    })
+      .unwrap()
+      .then((res) => {
+        setIsPayment(true);
+        setCurrentOrder(res);
+        clearCart();
       })
-        .unwrap()
-        .catch(console.error);
-      if (res) setIsPayment(true);
-      setCurrentOrder(res ?? undefined);
-    } else {
-      setIsPayment(true);
-    }
+      .catch(() => Alert.alert('Ошибка при создании заказа'));
+  };
+
+  const onBack = () => {
+    setIsPayment(false);
+    setCurrentOrder(undefined);
   };
 
   return (
     <View style={styles.container}>
-      <Header onBack={isPayment ? () => setIsPayment(false) : undefined} containerStyle={styles.headerContainer} />
+      <Header onBack={isPayment ? onBack : undefined} containerStyle={styles.headerContainer} />
       <ScrollView bounces={!isPayment && !!items.length}>
         <Text h3 style={styles.pageTitle}>
           {isPayment ? 'Оплата' : 'Корзина'}
@@ -75,7 +80,18 @@ const Cart: React.FC<NativeStackScreenProps<AppParamsList, 'Cart'>> = ({ navigat
           </View>
         )}
         {isPayment ? (
-          <Text>Пожалуйста, отсканируйте QR-код для оплаты заказа</Text>
+          <>
+            <Text style={{ fontSize: 16 }}>Пожалуйста, отсканируйте QR-код для оплаты заказа</Text>
+            <View style={{ alignItems: 'center', marginBottom: 20, marginTop: 40 }}>
+              <QRCode value={activeGroup?.paymentInfo?.link} size={200} />
+            </View>
+            <Text
+              onPress={() => Linking.openURL(activeGroup?.paymentInfo?.link ?? '')}
+              style={{ textDecorationLine: 'underline', textAlign: 'center' }}
+            >
+              Ссылка для перевода денег на карту
+            </Text>
+          </>
         ) : (
           items.map((item, i) => <CartItem key={i} index={i} item={item} />)
         )}
