@@ -2,7 +2,7 @@ import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button, Icon, Input, Text } from '@rneui/base';
 import React, { useEffect, useState } from 'react';
-import { Alert, Pressable, SafeAreaView, View, StyleSheet } from 'react-native';
+import { Alert, Pressable, View, StyleSheet } from 'react-native';
 import { AppParamsList } from '../components/Layout.component';
 import { useAppActions, useAppSelector } from '../hooks/useApp';
 import { useAuthMutation, useRegisterMutation } from '../store/apis/auth.api';
@@ -82,7 +82,7 @@ const Auth: React.FC<NativeStackScreenProps<AppParamsList, 'Auth'>> = ({ navigat
   if (state === 'wait') return <Loading />;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.wrapper}>
         <Text h2 style={styles.wrapperTitle}>
           {isLogin ? 'Войти' : 'Регистрация'}
@@ -126,7 +126,7 @@ const Auth: React.FC<NativeStackScreenProps<AppParamsList, 'Auth'>> = ({ navigat
           <Text style={styles.secondaryBtn}>{isLogin ? 'Зарегистрироваться' : 'Войти'}</Text>
         </Pressable>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
